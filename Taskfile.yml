@@ -1,0 +1,65 @@
+version: '3'
+
+vars:
+  SERVICE: mkvextract-subs
+
+env:
+  UID:
+    sh: id -u
+  GID:
+    sh: id -g
+
+tasks:
+  default:
+    cmds:
+      - task --list
+
+  # Application
+  run:
+    desc: Extract subtitles, attachments, chapters and tags
+    summary: |
+      Usage:
+      
+      For directories:
+      * task run
+      
+      For subdirectory:
+      * task run -- -i "test"
+      
+      For single file:
+      * task run -- -i "never-gonna-give-you-up.mkv"
+    cmds:
+      - mkdir -p ${PWD}/input
+      - docker compose run --rm {{.SERVICE}} python main.py {{.CLI_ARGS}}
+
+  down:
+    desc: Down service
+    cmds:
+      - docker compose down --remove-orphans
+
+  # Tools
+  contribute:
+    desc: Tasks for contributing
+    cmds:
+      - task: tools:pylint
+      - task: tools:pycodestyle
+
+  tools:pylint:
+    desc: Run pylint
+    cmds:
+      - docker compose run -u root --rm {{.SERVICE}} pylint --max-line-length=120 --recursive=y .
+
+  tools:pycodestyle:
+    desc: Run pycodestyle
+    cmds:
+      - docker compose run -u root --rm {{.SERVICE}} pycodestyle --max-line-length=120 --show-source .
+
+  tools:black:check:
+    desc: Run black dryrun
+    cmds:
+      - docker compose run -u root --rm {{.SERVICE}} black . --diff --color
+
+  tools:black:fix:
+    desc: Run black
+    cmds:
+      - docker compose run -u root --rm {{.SERVICE}} black .

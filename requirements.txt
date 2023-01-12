@@ -1,0 +1,5 @@
+pyfiglet==0.8.post1
+rich==13.0.1
+pylint==2.15.10
+pycodestyle==2.10.0
+black==22.12.0
