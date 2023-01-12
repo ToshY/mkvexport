@@ -2,7 +2,7 @@
 
 <div align="center">
     <img src="https://img.shields.io/github/v/release/toshy/mkvextract-subs?label=Release&sort=semver" alt="Current bundle version" />
-    <a href="https://hub.docker.com/r/t0shy/mkvextract-subs"><img src="https://img.shields.io/badge/Docker%20Hub-t0shy%2Fmkvextract-subs-blue" alt="Docker Hub" /></a>
+    <a href="https://hub.docker.com/r/t0shy/mkvextract-subs"><img src="https://img.shields.io/badge/Docker%20Hub-t0shy%2Fmkvextract--subs-blue" alt="Docker Hub" /></a>
     <img src="https://img.shields.io/github/actions/workflow/status/toshy/mkvextract-subs/pylint.yml?branch=main&label=Pylint" alt="Code style">
     <img src="https://img.shields.io/badge/Code%20Style-PEP8-orange.svg" alt="Code style" />
     <img src="https://img.shields.io/github/actions/workflow/status/toshy/mkvextract-subs/security.yml?branch=main&label=Security%20check" alt="Security check" />
