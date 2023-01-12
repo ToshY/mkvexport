@@ -16,7 +16,8 @@ RUN apt-get update \
 
 COPY requirements.txt ./
 
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt \
+    && pip install --no-cache-dir --upgrade --force-reinstall 'setuptools>=65.5.1'
 
 COPY . .
 
