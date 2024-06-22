@@ -1,4 +1,3 @@
-from mkvexport.banner import cli_banner
 from mkvexport.cli import cli
 
 if __name__ == "__main__":
@@ -8,5 +7,4 @@ if __name__ == "__main__":
     Documentation: https://github.com/ToshY/mkvexport
     """
 
-    cli_banner("mkvexport")
     cli()
