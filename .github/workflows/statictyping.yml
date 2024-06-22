@@ -1,4 +1,4 @@
-name: Pip audit
+name: Static typing with Mypy
 
 on:
   push:
@@ -9,8 +9,8 @@ on:
       - main
 
 jobs:
-  security:
-    name: Run pip-audit
+  mypy:
+    name: Run Mypy
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -24,9 +24,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install requirements
-        run: |
-          pip install -r requirements.txt
-          pip install --no-cache-dir --upgrade --force-reinstall 'setuptools>=65.5.1'
+        run: pip install -r requirements.txt -r requirements.dev.txt
 
-      - name: Pip audit
-        uses: pypa/gh-action-pip-audit@v1.0.8
+      - name: Mypy check
+        run: mypy .

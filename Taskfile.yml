@@ -1,65 +1,95 @@
 version: '3'
 
 vars:
-  SERVICE: mkvextract-subs
+  IMAGE: toshy/mkvexport
 
 env:
   UID:
     sh: id -u
   GID:
     sh: id -g
+  DOCKER_COMPOSE_RUN: docker compose --progress quiet run --no-TTY --rm --build
 
 tasks:
   default:
     cmds:
       - task --list
 
-  # Application
-  run:
-    desc: Extract subtitles, attachments, chapters and tags
-    summary: |
-      Usage:
-      
-      For directories:
-      * task run
-      
-      For subdirectory:
-      * task run -- -i "test"
-      
-      For single file:
-      * task run -- -i "never-gonna-give-you-up.mkv"
+  # Docker
+  build:
+    desc: Build local images
+    vars:
+      TARGETS: [ 'dev', 'prod' ]
     cmds:
-      - mkdir -p ${PWD}/input
-      - docker compose run --rm {{.SERVICE}} python main.py {{.CLI_ARGS}}
+      - for:
+          var: TARGETS
+        cmd: docker buildx build --target {{.ITEM}} --tag {{.IMAGE}}:{{.ITEM}} .
 
   down:
     desc: Down service
     cmds:
       - docker compose down --remove-orphans
 
-  # Tools
-  contribute:
-    desc: Tasks for contributing
+  # Shell
+  shell:dev:
+    desc: Container shell
+    vars:
+      TARGET: 'dev'
     cmds:
-      - task: tools:pylint
-      - task: tools:pycodestyle
+      - $DOCKER_COMPOSE_RUN {{.TARGET}} {{.CLI_ARGS | default "/bin/bash"}}
 
-  tools:pylint:
-    desc: Run pylint
+  shell:prod:
+    desc: Container shell prod
+    vars:
+      TARGET: 'prod'
+      INPUT_DIRECTORY: '{{.i | default "input"}}'
     cmds:
-      - docker compose run -u root --rm {{.SERVICE}} pylint --max-line-length=120 --recursive=y .
+      - docker buildx build --quiet --target {{.TARGET}} --tag {{.IMAGE}}:{{.TARGET}} .
+      - docker run -it -u $(id -u):$(id -g) -v $(pwd)/{{.INPUT_DIRECTORY}}:/app/input --entrypoint="/bin/bash" --rm {{.IMAGE}}:{{.TARGET}} {{.CLI_ARGS}}
 
-  tools:pycodestyle:
-    desc: Run pycodestyle
+  # Test
+  dev:
+    desc: Test dev image (compose)
+    vars:
+      TARGET: 'dev'
+      INPUT_DIRECTORY: '{{.i | default "input"}}'
     cmds:
-      - docker compose run -u root --rm {{.SERVICE}} pycodestyle --max-line-length=120 --show-source .
+      - mkdir -p $(pwd)/{{.INPUT_DIRECTORY}}
+      - $DOCKER_COMPOSE_RUN -u $(id -u):$(id -g) {{.TARGET}} python -m mkvexport {{.CLI_ARGS}}
 
-  tools:black:check:
-    desc: Run black dryrun
+  prod:
+    desc: Test prod image (docker)
+    silent: true
+    vars:
+      TARGET: 'prod'
+      INPUT_DIRECTORY: '{{.i | default "input"}}'
     cmds:
-      - docker compose run -u root --rm {{.SERVICE}} black . --diff --color
+      - docker buildx build --quiet --target {{.TARGET}} --tag {{.IMAGE}}:{{.TARGET}} .
+      - mkdir -p $(pwd)/{{.INPUT_DIRECTORY}}
+      - docker run -it -u $(id -u):$(id -g) -v $(pwd)/{{.INPUT_DIRECTORY}}:/app/input --rm {{.IMAGE}}:{{.TARGET}} {{.CLI_ARGS}}
 
-  tools:black:fix:
+  # Development tools
+  ruff:
+    desc: Run ruff
+    cmds:
+      - $DOCKER_COMPOSE_RUN dev ruff check .
+
+  ruff:fix:
+    desc: Run ruff fix
+    cmds:
+      - $DOCKER_COMPOSE_RUN dev ruff check --fix .
+
+  black:
     desc: Run black
     cmds:
-      - docker compose run -u root --rm {{.SERVICE}} black .
+      - $DOCKER_COMPOSE_RUN dev black . --check --diff --color
+
+  black:fix:
+    desc: Run black fix
+    cmds:
+      - $DOCKER_COMPOSE_RUN dev black .
+
+  mypy:
+    desc: Run mypy
+    cmds:
+      - $DOCKER_COMPOSE_RUN dev mypy .
