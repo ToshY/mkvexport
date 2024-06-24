@@ -1,16 +1,9 @@
 import subprocess as sp
+
 from mkvexport.exception import MKVmergeError, ProcessError
 
 
 class ProcessCommand:
-    """
-    Class for displaying subprocess information on the console.
-
-    Attributes:
-        logger: The logger object used for logging information.
-        process_exceptions: A dictionary mapping process names to corresponding exceptions.
-    """
-
     def __init__(self, logger):
         """
         Initializes a new instance of the ProcessCommand class.
@@ -30,17 +23,20 @@ class ProcessCommand:
 
     def run(self, process, command):
         """
-        Run a subprocess command and display information on the console.
+        Runs the specified process with the given command.
 
         Args:
-            process: The name of the process being executed.
-            command: The command to be executed.
-        Raises:
-            MKVmergeError: If the MKVmerge command fails.
-            ProcessError: If the subprocess fails.
+            process (str): The name of the process being executed.
+            command (List[str]): The command to be executed.
+
         Returns:
-            The response object from the subprocess execution.
+            CompletedProcess: The result of the command execution.
+
+        Raises:
+            MKVmergeError: If the process is 'mkvmerge' and it fails with a non-zero exit code.
+            ProcessError: If the process fails with a non-zero exit code and no specific exception is defined.
         """
+
         self.logger.info(
             f"The following {process} command will be executed: {' '.join(command)}"
         )

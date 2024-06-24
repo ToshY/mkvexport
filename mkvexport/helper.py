@@ -5,19 +5,19 @@ from mkvexport.exception import SubtitleCodecError
 
 def files_in_dir(path: Path, file_types=["*.mkv"]):
     """
-    Returns a list of files in the specified directory that match the given file types.
+    Returns a list of files in the given directory that match the specified file types.
 
-    Args:
+    Parameters:
         path (Path): The path to the directory.
         file_types (List[str], optional): A list of file types to match. Defaults to ["*.mkv"].
 
     Returns:
-        List[Path]: A list of Path objects representing the files in the directory that match the given file types.
+        List[Path]: A list of paths to the files in the directory that match the specified file types.
     """
 
-    flist = [f for f_ in [path.rglob(e) for e in file_types] for f in f_]
+    file_list = [f for f_ in [path.rglob(e) for e in file_types] for f in f_]
 
-    return flist
+    return file_list
 
 
 def get_subtitle_extension_from_codec_id(codec_id: str) -> str:
