@@ -8,16 +8,18 @@ ENV PIP_ROOT_USER_ACTION ignore
 
 WORKDIR /build
 
-RUN set -ex \
-    && apt-get update \
-    && apt-get install -y build-essential cmake wget \
-    && wget -O /usr/share/keyrings/gpg-pub-moritzbunkus.gpg https://mkvtoolnix.download/gpg-pub-moritzbunkus.gpg \
-    && echo "deb [signed-by=/usr/share/keyrings/gpg-pub-moritzbunkus.gpg] https://mkvtoolnix.download/debian/ bookworm main" > /etc/apt/sources.list.d/mkvtoolnix.download.list \
-    && echo "deb-src [signed-by=/usr/share/keyrings/gpg-pub-moritzbunkus.gpg] https://mkvtoolnix.download/debian/ bookworm main" >> /etc/apt/sources.list.d/mkvtoolnix.download.list \
-    && apt-get update \
-    && apt install -y mkvtoolnix \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+RUN <<EOT bash
+  set -ex
+  apt-get update
+  apt install -y build-essential cmake wget
+  wget -O /usr/share/keyrings/gpg-pub-moritzbunkus.gpg https://mkvtoolnix.download/gpg-pub-moritzbunkus.gpg
+  echo "deb [signed-by=/usr/share/keyrings/gpg-pub-moritzbunkus.gpg] https://mkvtoolnix.download/debian/ bookworm main" > /etc/apt/sources.list.d/mkvtoolnix.download.list
+  echo "deb-src [signed-by=/usr/share/keyrings/gpg-pub-moritzbunkus.gpg] https://mkvtoolnix.download/debian/ bookworm main" >> /etc/apt/sources.list.d/mkvtoolnix.download.list
+  apt-get update
+  apt install -y mkvtoolnix
+  apt-get clean
+  rm -rf /var/lib/apt/lists/*
+EOT
 
 COPY requirements.txt ./
 
@@ -32,9 +34,11 @@ RUN pip install .
 
 WORKDIR /app
 
-RUN set -ex \
-    && /bin/bash -c 'mkdir -p ./{input}' \
-    && rm -rf /build
+RUN <<EOT bash
+  set -ex
+  mkdir -p ./{input,output}
+  rm -rf /build
+EOT
 
 ENTRYPOINT ["mkvexport"]
 
