@@ -1,0 +1,51 @@
+site_name: MKVexport
+site_description: Command-line utility for extracting attachments (subtitles, fonts and chapters) of MKV files.
+repo_name: ToshY/mkvexport
+repo_url: https://github.com/ToshY/mkvexport
+docs_dir: docs/
+site_dir: site/
+theme:
+  name: material
+  icon:
+    repo: fontawesome/brands/github
+  font: false
+  features:
+    - navigation.footer
+    - navigation.indexes
+    - navigation.sections
+    - toc.follow
+    - navigation.top
+    - content.code.copy
+    - content.code.annotate
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
+markdown_extensions:
+  - abbr:
+  - tables:
+  - toc:
+  - admonition:
+  - pymdownx.details:
+  - pymdownx.extra:
+  - pymdownx.highlight:
+      use_pygments: false
+extra_javascript:
+  - https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js
+  - javascripts/highlight.js
+extra_css:
+  - https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/tokyo-night-dark.min.css
+  - stylesheets/extra.css
+extra:
+  generator: false
+nav:
+  - About: index.md
+  - Getting Started: getting-started.md
+  - Examples: examples.md

@@ -1,0 +1,107 @@
+version: '3'
+
+vars:
+  IMAGE: toshy/mkvexport
+
+env:
+  UID:
+    sh: id -u
+  GID:
+    sh: id -g
+  DOCKER_COMPOSE_RUN: docker compose --progress quiet run --no-TTY --rm --build
+
+tasks:
+  default:
+    cmds:
+      - task --list
+
+  # Docker
+  build:
+    desc: Build local images
+    vars:
+      TARGETS: [ 'dev', 'prod' ]
+    cmds:
+      - for:
+          var: TARGETS
+        cmd: docker buildx build --target {{.ITEM}} --tag {{.IMAGE}}:{{.ITEM}} .
+
+  down:
+    desc: Down service
+    cmds:
+      - docker compose down --remove-orphans
+
+  # Shell
+  shell:dev:
+    desc: Container shell
+    vars:
+      TARGET: 'dev'
+    cmds:
+      - $DOCKER_COMPOSE_RUN {{.TARGET}} {{.CLI_ARGS | default "/bin/bash"}}
+
+  shell:prod:
+    desc: Container shell prod
+    vars:
+      TARGET: 'prod'
+      INPUT_DIRECTORY: '{{.i | default "input"}}'
+    cmds:
+      - docker buildx build --quiet --target {{.TARGET}} --tag {{.IMAGE}}:{{.TARGET}} .
+      - docker run -it -u $(id -u):$(id -g) -v ${PWD}/{{.INPUT_DIRECTORY}}:/app/input --entrypoint="/bin/bash" --rm {{.IMAGE}}:{{.TARGET}} {{.CLI_ARGS}}
+
+  # Test
+  dev:
+    desc: Test dev image (compose)
+    vars:
+      TARGET: 'dev'
+      INPUT_DIRECTORY: '{{.i | default "input"}}'
+    cmds:
+      - mkdir -p ${PWD}/{{.INPUT_DIRECTORY}}
+      - $DOCKER_COMPOSE_RUN -u $(id -u):$(id -g) {{.TARGET}} python -m mkvexport {{.CLI_ARGS}}
+
+  prod:
+    desc: Test prod image (docker)
+    silent: true
+    vars:
+      TARGET: 'prod'
+      INPUT_DIRECTORY: '{{.i | default "input"}}'
+    cmds:
+      - docker buildx build --quiet --target {{.TARGET}} --tag {{.IMAGE}}:{{.TARGET}} .
+      - mkdir -p ${PWD}/{{.INPUT_DIRECTORY}}
+      - docker run -it -u $(id -u):$(id -g) -v ${PWD}/{{.INPUT_DIRECTORY}}:/app/input --rm {{.IMAGE}}:{{.TARGET}} {{.CLI_ARGS}}
+
+  # Development tools
+  ruff:
+    desc: Run ruff
+    cmds:
+      - $DOCKER_COMPOSE_RUN dev ruff check .
+
+  ruff:fix:
+    desc: Run ruff fix
+    cmds:
+      - $DOCKER_COMPOSE_RUN dev ruff check --fix .
+
+  black:
+    desc: Run black
+    cmds:
+      - $DOCKER_COMPOSE_RUN dev black . --check --diff --color
+
+  black:fix:
+    desc: Run black fix
+    cmds:
+      - $DOCKER_COMPOSE_RUN dev black .
+
+  mypy:
+    desc: Run mypy
+    cmds:
+      - $DOCKER_COMPOSE_RUN dev mypy .
+
+  mkdocs:
+    desc: MkDocs build
+    cmds:
+      - docker run --rm -it -v ${PWD}:/docs ghcr.io/squidfunk/mkdocs-material:9.5 build
+
+  mkdocs:live:
+    desc: MkDocs development server
+    vars:
+      PORT: '{{.p | default "8001"}}'
+    cmds:
+      - docker run --rm -it -p {{.PORT}}:8000 -v ${PWD}:/docs ghcr.io/squidfunk/mkdocs-material:9.5
