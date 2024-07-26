@@ -1,3 +1,4 @@
+import fnmatch
 from pathlib import Path
 
 from mkvexport.exception import SubtitleCodecError
@@ -15,7 +16,13 @@ def files_in_dir(path: Path, file_types=["*.mkv"]):
         List[Path]: A list of paths to the files in the directory that match the specified file types.
     """
 
-    file_list = [f for f_ in [path.rglob(e) for e in file_types] for f in f_]
+    file_list = [
+        f
+        for f in path.rglob("*")
+        if any(
+            fnmatch.fnmatch(f.name.lower(), pattern.lower()) for pattern in file_types
+        )
+    ]
 
     return file_list
 
