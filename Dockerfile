@@ -4,7 +4,7 @@ FROM python:${PYTHON_IMAGE_VERSION}-slim-bookworm AS base
 
 LABEL maintainer="ToshY (github.com/ToshY)"
 
-ENV PIP_ROOT_USER_ACTION ignore
+ENV PIP_ROOT_USER_ACTION=ignore
 
 WORKDIR /build
 
