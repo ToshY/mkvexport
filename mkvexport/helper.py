@@ -33,7 +33,7 @@ def get_subtitle_extension_from_codec_id(codec_id: str) -> str:
             return "ass"
         case "S_TEXT/UTF8":
             return "srt"
-        case "S_TEXT/PGS":
+        case "S_TEXT/PGS" | "S_HDMV/PGS":
             return "sup"
         case "S_VOBSUB":
             return "sub"
