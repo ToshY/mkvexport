@@ -12,7 +12,7 @@
 
 ## 📝 Quickstart
 
-```shell
+```sh
 docker run -it --rm \
   -u $(id -u):$(id -g) \
   -v ${PWD}/input:/app/input \

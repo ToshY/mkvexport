@@ -26,7 +26,7 @@ structure after exporting the attachments.
 
 Add your files to the input directory of the mounted container.
 
-```shell
+```sh
 docker run -it --rm \
   -u $(id -u):$(id -g) \
   -v ${PWD}/input:/app/input \
@@ -39,7 +39,7 @@ By default, it will find all files from the `/app/input` directory (recursively)
 
 Export attachments for a specific file.
 
-```shell
+```sh
 docker run -it --rm \
   -u $(id -u):$(id -g) \
   -v ${PWD}/input:/app/input \
@@ -51,7 +51,7 @@ docker run -it --rm \
 
 Export attachments for a specific subdirectory.
 
-```shell
+```sh
 docker run -it --rm \
   -u $(id -u):$(id -g) \
   -v ${PWD}/input:/app/input \
@@ -63,7 +63,7 @@ docker run -it --rm \
 
 Export attachments for files in multiple subdirectories.
 
-```shell
+```sh
 docker run -it --rm \
   -u $(id -u):$(id -g) \
   -v ${PWD}/input:/app/input \
